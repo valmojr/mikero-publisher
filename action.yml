@@ -23,12 +23,6 @@ runs:
         if (-not $env:EXCLUSION_MODIFIER) {
             $env:EXCLUSION_MODIFIER = "init*.sqf,init*.sqs"
         }
-        if (Test-Path -Path $outputDirectory) {
-            Write-Output "Folder $outputDirectory already exists"
-        } else {
-            Write-Output "Creating build folder"
-            mkdir $outputDirectory
-        }
         foreach ($addon in $nonObfuscatedAddons) {
                 # Pack the addon
                 Write-Output "Packing $rootFolder"
