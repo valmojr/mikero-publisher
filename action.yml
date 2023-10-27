@@ -26,12 +26,12 @@ runs:
         foreach ($addon in $nonObfuscatedAddons) {
                 # Pack the addon
                 Write-Output "Packing $rootFolder"
-                Invoke-Command 'pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString $mainDirectory"\"$addon +M=$outputDirectory' > NUL
+                pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString $mainDirectory"\"$addon +M=$outputDirectory > NUL
         }
         foreach ($addon in $obfuscatedAddons) {
                 # Pack the addon
                 Write-Output "Packing $rootFolder"
-                Invoke-Command 'pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString +O $mainDirectory"\"$addon +M=$outputDirectory' > NUL  
+                pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString +O $mainDirectory"\"$addon +M=$outputDirectory > NUL  
         }
       shell: pwsh
 
