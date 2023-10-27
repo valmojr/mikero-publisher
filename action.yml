@@ -13,6 +13,7 @@ runs:
         # Env variables from the action.yml file
         echo +$env:OUTPUT_DIRECTORY
         # $outputDirectory = $mainDirectory+$env:OUTPUT_DIRECTORY
+        echo +$env:KEY_DIRECTORY
         # $keyDirectory = $mainDirectory+$env:KEY_DIRECTORY
         $excludeFromAddonString = $env:EXCLUDE_FROM_PBO
         $exclusionModifierString = $env:EXCLUSION_MODIFIER
