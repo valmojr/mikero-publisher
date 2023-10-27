@@ -1,0 +1,52 @@
+name: Mikero Packer
+description: Uses Mikero Tools to pack PBOs
+runs:
+  using: composite
+  steps:
+    - name: Install Mikero Tools
+      run: | 
+        . .\scripts\addons_list.ps1
+        $mainDirectory = Split-Path -parent $MyInvocation.MyCommand.Definition
+        $lastCommit = git log -1 --pretty=format:%H
+        $changedFiles = git diff-tree --no-commit-id --name-only -r $lastCommit
+        $rootFolders = @()
+        $outputDirectory = $mainDirectory+$env:OUTPUT_DIRECTORY
+        $keyDirectory = $mainDirectory+$env:KEY_DIRECTORY
+        $excludeFromAddonString = $env:EXCLUDE_FROM_PBO
+        $exclusionModifierString = $env:EXCLUSION_MODIFIER
+        if (-not $env:EXCLUDE_FROM_PBO) {
+            $env:EXCLUDE_FROM_PBO = "*.h,*.hpp,*.png,*.cpp,*.txt,thumbs.db,*.dep,*.bak,*.log,*.pew,source,*.tga,*.bat,*.psd,*.cmd,*.mcr,*.fbx,*.max"
+        }
+        if (-not $env:EXCLUSION_MODIFIER) {
+            $env:EXCLUSION_MODIFIER = "init*.sqf,init*.sqs"
+        }
+        $outputDirectory = $mainDirectory+"\build"
+        $keyDirectory = $mainDirectory+"\keys\braf.biprivatekey"
+        if (Test-Path -Path $outputDirectory) {
+            Write-Output "Folder $outputDirectory already exists"
+        } else {
+            Write-Output "Creating build folder"
+            mkdir $outputDirectory
+        }
+        foreach ($file in $changedFiles) {
+            if ($file.Contains("/")) {
+                while($file.Contains("/")) {
+                    $file = $file.Substring(0, $file.IndexOf("/"))
+                }
+                if ($rootFolders -notcontains $file) {
+                    $rootFolders += $file
+                }
+            }
+        }
+        foreach ($rootFolder in $rootFolders) {
+            if ($obfusctedAddons -contains $rootFolder) {
+                # Pack and Obfuscate the addon
+                Write-Output "Packing and Obfuscating $rootFolder"
+                pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString $mainDirectory"\"$rootFolder +M=$outputDirectory
+            } elseif ($nonObfuscatedAddons -contains $rootFolder) {
+                # Pack the addon
+                Write-Output "Packing $rootFolder"
+                pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString +O $mainDirectory"\"$rootFolder +M=$outputDirectory
+            }
+        }
+      shell: pwsh
