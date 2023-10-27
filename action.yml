@@ -5,7 +5,8 @@ runs:
   steps:
     - name: Install Mikero Tools
       run: | 
-        .\scripts\addons_list.ps1
+        $obfusctedAddons = @("braf_teste")
+        $nonObfuscatedAddons = @("braf_outro_teste")
         $mainDirectory = Split-Path -parent $MyInvocation.MyCommand.Definition
         $lastCommit = git log -1 --pretty=format:%H
         $changedFiles = git diff-tree --no-commit-id --name-only -r $lastCommit
