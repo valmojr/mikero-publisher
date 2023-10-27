@@ -10,8 +10,8 @@ runs:
         $lastCommit = git log -1 --pretty=format:%H
         $changedFiles = git diff-tree --no-commit-id --name-only -r $lastCommit
         $rootFolders = @()
-        $outputDirectory = $mainDirectory+$env:OUTPUT_DIRECTORY
-        $keyDirectory = $mainDirectory+$env:KEY_DIRECTORY
+        $outputDirectory = $env:OUTPUT_DIRECTORY
+        $keyDirectory = $env:KEY_DIRECTORY
         $excludeFromAddonString = $env:EXCLUDE_FROM_PBO
         $exclusionModifierString = $env:EXCLUSION_MODIFIER
         if (-not $env:EXCLUDE_FROM_PBO) {
