@@ -11,37 +11,24 @@ runs:
         $nonObfuscatedAddons = @("braf_outro_teste")
         $mainDirectory = Split-Path -parent $MyInvocation.MyCommand.Definition
         # Env variables from the action.yml file
-        echo +$env:OUTPUT_DIRECTORY
-        # $outputDirectory = $mainDirectory+$env:OUTPUT_DIRECTORY
-        echo +$env:KEY_DIRECTORY
-        # $keyDirectory = $mainDirectory+$env:KEY_DIRECTORY
-        $excludeFromAddonString = $env:EXCLUDE_FROM_PBO
-        $exclusionModifierString = $env:EXCLUSION_MODIFIER
-        if (-not $env:EXCLUDE_FROM_PBO) {
-            $env:EXCLUDE_FROM_PBO = "*.h,*.hpp,*.png,*.cpp,*.txt,thumbs.db,*.dep,*.bak,*.log,*.pew,source,*.tga,*.bat,*.psd,*.cmd,*.mcr,*.fbx,*.max"
-        }
-        if (-not $env:EXCLUSION_MODIFIER) {
-            $env:EXCLUSION_MODIFIER = "init*.sqf,init*.sqs"
-        }
+        $outputDirectory = "$env:OUTPUT_DIRECTORY"
+        $keyDirectory = "$env:KEY_DIRECTORY"
+        $excludeFromAddonString = "$env:EXCLUDE_FROM_PBO"
+        $exclusionModifierString = "$env:EXCLUSION_MODIFIER"
+
         foreach ($addon in $nonObfuscatedAddons) {
                 # Pack the addon
-                Write-Output "Packing $rootFolder"
-                # pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString $mainDirectory"\"$addon +M=$outputDirectory > obfuscatedAddons.log
-                Write-Output $keyDirectory
-                Write-Output $exclusionModifierString
-                Write-Output $excludeFromAddonString
-                Write-Output $mainDirectory"\"$addon
-                Write-Output $outputDirectory
+                $addonDirectory = (Resolve-Path $addon).Path
+                Write-Output "Packing $addon"
+                Write-Output $addonDirectory
+                Write-Output "pboProject.exe -P +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString $addonDirectory +M=$outputDirectory"
         }
-        foreach ($addon in $obfuscatedAddons) {
+        foreach ($addon in $obfusctedAddons) {
                 # Pack the addon
-                Write-Output "Packing $rootFolder"
-                # pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString +O $mainDirectory"\"$addon +M=$outputDirectory > nonObfuscatedAddons.log  
-                Write-Output $keyDirectory
-                Write-Output $exclusionModifierString
-                Write-Output $excludeFromAddonString
-                Write-Output $mainDirectory"\"$addon
-                Write-Output $outputDirectory
+                $addonDirectory = (Resolve-Path $addon).Path
+                Write-Output "Packing $addon"
+                Write-Output $addonDirectory
+                Write-Output "pboProject.exe -P +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString +O $addonDirectory +M=$outputDirectory"
         }
       shell: pwsh
 
