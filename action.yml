@@ -5,8 +5,14 @@ runs:
   steps:
     - name: Install Mikero Tools for packing
       run: | 
-        $obfusctedAddons = @("braf_teste")
-        $nonObfuscatedAddons = @("braf_outro_teste")
+        $builder = Get-Content -Path builder.json -Raw | ConvertFrom-Json
+        $pullRequestCommitHash = git rev-parse --verify HEAD
+        $originCommitHash = git ls-remote origin main | ForEach-Object { $_.Split()[0] }
+        $git_diff_output = git diff --name-only $pullRequestCommitHash $originCommitHash
+        $root_dirs = $git_diff_output -replace '([^/]+).+', '$1' | Sort-Object -Unique
+        $json_array = $root_dirs -join '","'
+        $json_array = '["' + $json_array + '"]'
+        Write-Output $json_array
         $mainDirectory = Split-Path -parent $MyInvocation.MyCommand.Definition
         # Env variables from the action.yml file
         $outputDirectory = "$env:OUTPUT_DIRECTORY"
@@ -14,14 +20,14 @@ runs:
         $excludeFromAddonString = "$env:EXCLUDE_FROM_PBO"
         $exclusionModifierString = "$env:EXCLUSION_MODIFIER"
 
-        foreach ($addon in $nonObfuscatedAddons) {
+        foreach ($addon in $builder.binarizedAddons) {
                 # Pack the addon
                 $addonDirectory = (Resolve-Path $addon).Path
                 Write-Output "Packing $addon"
                 Write-Output $addonDirectory
                 Write-Output "pboProject.exe -P +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString $addonDirectory +M=$outputDirectory"
         }
-        foreach ($addon in $obfusctedAddons) {
+        foreach ($addon in $builder.obfuscatedAddons) {
                 # Pack the addon
                 Write-Output "Packing $rootFolder"
                 pboProject.exe +N +K=$keyDirectory +C -Z=$exclusionModifierString -B -X=$excludeFromAddonString +O $mainDirectory"\"$addon +M=$outputDirectory > NUL  
